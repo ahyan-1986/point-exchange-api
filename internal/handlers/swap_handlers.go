@@ -40,7 +40,6 @@ func CreateDeposit(c *gin.Context) {
 		return
 	}
 
-	// TODO: Add business logic, validation, rate lookup, etc. in service
 	id, err := SwapService.CreateSwap(c.Request.Context(), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

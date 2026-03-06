@@ -555,6 +555,29 @@
                     }
                 }
             }
+        },
+        "/v1/version": {
+            "get": {
+                "description": "Returns API version and build time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "version"
+                ],
+                "summary": "API version info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -575,6 +598,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "rate": {
+                    "type": "number"
                 }
             }
         },
@@ -628,6 +654,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "rate": {
+                    "type": "number"
                 }
             }
         },

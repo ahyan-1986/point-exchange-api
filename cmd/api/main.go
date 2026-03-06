@@ -43,11 +43,12 @@ func main() {
 	r.Use(cors.Default())
 
 	// --- Dependency Injection ---
+
 	swapRepo := dbpkg.NewSwapRepository(db)
-	swapService := &services.SwapService{Repo: swapRepo}
+	partnerRepo := dbpkg.NewPartnerRepository(db)
+	swapService := &services.SwapService{Repo: swapRepo, PartnerRepo: partnerRepo}
 	swapHandlers.SwapService = swapService
 
-	partnerRepo := dbpkg.NewPartnerRepository(db)
 	partnerService := &services.PartnerService{Repo: partnerRepo}
 	partnerHandlers.PartnerService = partnerService
 

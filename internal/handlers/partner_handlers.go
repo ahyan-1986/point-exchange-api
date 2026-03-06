@@ -27,10 +27,11 @@ func SetPartnerService(s PartnerServiceInterface) {
 }
 
 type RegisterPartnerRequest struct {
-	Name      string `json:"name" binding:"required"`
-	APIKey    string `json:"api_key"`
-	APISecret string `json:"api_secret"`
-	IsActive  *bool  `json:"is_active"`
+	Name      string  `json:"name" binding:"required"`
+	APIKey    string  `json:"api_key"`
+	APISecret string  `json:"api_secret"`
+	IsActive  *bool   `json:"is_active"`
+	Rate      float64 `json:"rate"`
 }
 
 // RegisterPartner godoc
@@ -73,6 +74,7 @@ func RegisterPartner(c *gin.Context) {
 		APISecret: apiSecret,
 		IsActive:  isActive,
 		CreatedAt: time.Now(),
+		Rate:      req.Rate,
 	}
 	_, err := PartnerService.RegisterPartner(c.Request.Context(), &partner)
 	if err != nil {

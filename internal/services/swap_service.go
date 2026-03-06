@@ -2,12 +2,14 @@ package services
 
 import (
 	"context"
+	"errors"
 	"point-exchange-api/internal/db"
 	"point-exchange-api/models"
 )
 
 type SwapService struct {
-	Repo db.SwapRepository
+	Repo        db.SwapRepository
+	PartnerRepo db.PartnerRepository
 }
 
 func (s *SwapService) ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error) {
@@ -23,16 +25,27 @@ func (s *SwapService) ListSwapsWithFilter(ctx context.Context, status, sourcePar
 }
 
 func (s *SwapService) CreateSwap(ctx context.Context, req *models.SwapRequest) (string, error) {
-	// Map request to ledger, set initial status and timestamps
+	// Fetch partner's rate
+	partner, err := s.PartnerRepo.GetPartnerByID(ctx, req.SourcePartnerID)
+	if err != nil {
+		return "", err
+	}
+	if partner == nil {
+		return "", errors.New("source partner not found")
+	}
+	rate := partner.Rate
+	usdValue := req.SourcePoints * rate
 	ledger := &models.SwapLedger{
-		SourcePartnerID:   req.SourcePartnerID,
-		SourceExternalRef: req.SourceExternalID,
-		SourceCustomerID:  req.SourceCustomerID,
-		SourcePoints:      req.SourcePoints,
-		TargetPartnerID:   req.TargetPartnerID,
-		TargetCustomerID:  req.TargetCustomerID,
-		Status:            "PENDING",
-		// USDValue, ExchangeRateAtTime, CommissionUSD, TargetPoints can be set by business logic if needed
+		SourcePartnerID:    req.SourcePartnerID,
+		SourceExternalRef:  req.SourceExternalID,
+		SourceCustomerID:   req.SourceCustomerID,
+		SourcePoints:       req.SourcePoints,
+		USDValue:           usdValue,
+		ExchangeRateAtTime: &rate,
+		TargetPartnerID:    req.TargetPartnerID,
+		TargetCustomerID:   req.TargetCustomerID,
+		Status:             "PENDING",
+		// CommissionUSD, TargetPoints can be set by business logic if needed
 	}
 	return s.Repo.CreateSwap(ctx, ledger)
 }

@@ -566,6 +566,29 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/version": {
+            "get": {
+                "description": "Returns API version and build time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "version"
+                ],
+                "summary": "API version info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -586,6 +609,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "rate": {
+                    "type": "number"
                 }
             }
         },
@@ -639,6 +665,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "rate": {
+                    "type": "number"
                 }
             }
         },

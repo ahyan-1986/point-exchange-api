@@ -22,8 +22,8 @@ func NewPartnerRepository(db *sql.DB) PartnerRepository {
 }
 
 func (r *partnerRepo) CreatePartner(ctx context.Context, partner *models.Partner) (string, error) {
-	query := `INSERT INTO partners (id, name, api_key, api_secret, is_active, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.ExecContext(ctx, query, partner.ID, partner.Name, partner.APIKey, partner.APISecret, partner.IsActive, partner.CreatedAt)
+	query := `INSERT INTO partners (id, name, api_key, api_secret, is_active, created_at, rate) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err := r.db.ExecContext(ctx, query, partner.ID, partner.Name, partner.APIKey, partner.APISecret, partner.IsActive, partner.CreatedAt, partner.Rate)
 	if err != nil {
 		return "", err
 	}
@@ -31,7 +31,7 @@ func (r *partnerRepo) CreatePartner(ctx context.Context, partner *models.Partner
 }
 
 func (r *partnerRepo) ListPartners(ctx context.Context) ([]*models.Partner, error) {
-	rows, err := r.db.QueryContext(ctx, `SELECT id, name, api_key, api_secret, is_active, created_at FROM partners`)
+	rows, err := r.db.QueryContext(ctx, `SELECT id, name, api_key, api_secret, is_active, created_at, rate FROM partners`)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (r *partnerRepo) ListPartners(ctx context.Context) ([]*models.Partner, erro
 	var partners []*models.Partner
 	for rows.Next() {
 		p := &models.Partner{}
-		err := rows.Scan(&p.ID, &p.Name, &p.APIKey, &p.APISecret, &p.IsActive, &p.CreatedAt)
+		err := rows.Scan(&p.ID, &p.Name, &p.APIKey, &p.APISecret, &p.IsActive, &p.CreatedAt, &p.Rate)
 		if err != nil {
 			return nil, err
 		}
@@ -49,9 +49,9 @@ func (r *partnerRepo) ListPartners(ctx context.Context) ([]*models.Partner, erro
 }
 
 func (r *partnerRepo) GetPartnerByID(ctx context.Context, id string) (*models.Partner, error) {
-	row := r.db.QueryRowContext(ctx, `SELECT id, name, api_key, api_secret, is_active, created_at FROM partners WHERE id = $1`, id)
+	row := r.db.QueryRowContext(ctx, `SELECT id, name, api_key, api_secret, is_active, created_at, rate FROM partners WHERE id = $1`, id)
 	p := &models.Partner{}
-	err := row.Scan(&p.ID, &p.Name, &p.APIKey, &p.APISecret, &p.IsActive, &p.CreatedAt)
+	err := row.Scan(&p.ID, &p.Name, &p.APIKey, &p.APISecret, &p.IsActive, &p.CreatedAt, &p.Rate)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

@@ -9,6 +9,7 @@ type Partner struct {
 	APISecret string    `json:"api_secret"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
+	Rate      float64   `json:"rate"`
 }
 
 type ActivatePartnerRequest struct {
