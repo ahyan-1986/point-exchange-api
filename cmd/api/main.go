@@ -84,6 +84,9 @@ func main() {
 		// Health & admin
 		v1.GET("/health", healthHandlers.HealthCheck)
 		v1.GET("/admin/ledger", adminHandlers.AdminLedger)
+
+		// Version info
+		v1.GET("/version", healthHandlers.VersionCheck)
 	}
 
 	r.Run(":8080") // 在 8080 端口启动
