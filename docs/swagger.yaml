@@ -1,0 +1,489 @@
+definitions:
+  internal_handlers.RegisterPartnerRequest:
+    properties:
+      api_key:
+        type: string
+      api_secret:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.ActivatePartnerRequest:
+    properties:
+      is_active:
+        type: boolean
+    type: object
+  models.AddOrUpdateRateRequest:
+    properties:
+      min_exchange_points:
+        type: number
+      point_type:
+        type: string
+      points_per_usd:
+        type: number
+    type: object
+  models.ConfirmSwapRequest:
+    properties:
+      id:
+        type: string
+    type: object
+  models.Partner:
+    properties:
+      api_key:
+        type: string
+      api_secret:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  models.Rate:
+    properties:
+      created_at:
+        type: string
+      effective_date:
+        type: string
+      id:
+        type: integer
+      min_exchange_points:
+        type: number
+      partner_id:
+        type: string
+      point_type:
+        type: string
+      points_per_usd:
+        type: number
+    type: object
+  models.SwapLedger:
+    properties:
+      claimed_at:
+        type: string
+      commission_usd:
+        type: number
+      completed_at:
+        type: string
+      created_at:
+        type: string
+      exchange_rate_at_time:
+        type: number
+      id:
+        type: string
+      source_customer_id:
+        type: string
+      source_external_ref:
+        type: string
+      source_partner_id:
+        type: string
+      source_points:
+        type: number
+      status:
+        type: string
+      target_customer_id:
+        type: string
+      target_partner_id:
+        type: string
+      target_points:
+        type: number
+      updated_at:
+        type: string
+      usd_value:
+        type: number
+    type: object
+  models.SwapRequest:
+    properties:
+      source_customer_id:
+        type: string
+      source_external_id:
+        type: string
+      source_partner_id:
+        type: string
+      source_points:
+        type: number
+      target_customer_id:
+        type: string
+      target_partner_id:
+        type: string
+    required:
+    - source_customer_id
+    - source_external_id
+    - source_partner_id
+    - source_points
+    - target_customer_id
+    - target_partner_id
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/admin/ledger:
+    get:
+      description: 'Admin: Query swap ledger with filters'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      summary: Query swap ledger
+      tags:
+      - admin
+  /v1/health:
+    get:
+      description: Returns service health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /v1/partners:
+    get:
+      description: Get a list of all partners (admin only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Partner'
+            type: array
+      summary: List all partners
+      tags:
+      - partners
+    post:
+      consumes:
+      - application/json
+      description: Register a new partner (admin only)
+      parameters:
+      - description: Partner info
+        in: body
+        name: partner
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.RegisterPartnerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Partner'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new partner
+      tags:
+      - partners
+  /v1/partners/{id}:
+    get:
+      description: Get details for a specific partner
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Partner'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get partner details
+      tags:
+      - partners
+  /v1/partners/{id}/activate:
+    patch:
+      consumes:
+      - application/json
+      description: Set a partner's active status (admin only)
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Active status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ActivatePartnerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Partner'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Activate or deactivate a partner
+      tags:
+      - partners
+  /v1/partners/{id}/rates:
+    get:
+      description: Get all point rates for a partner
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Rate'
+            type: array
+      summary: List all rates for a partner
+      tags:
+      - rates
+    post:
+      consumes:
+      - application/json
+      description: Add or update a point rate for a partner (admin only)
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rate info
+        in: body
+        name: rate
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddOrUpdateRateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add or update a partner's point rate
+      tags:
+      - rates
+  /v1/partners/{id}/swaps/received:
+    get:
+      description: List all swaps where this partner is the target (received swaps)
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwapLedger'
+            type: array
+      summary: List swaps received by partner
+      tags:
+      - swaps
+  /v1/partners/{id}/swaps/requested:
+    get:
+      description: List all swaps where this partner is the source (requested swaps)
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwapLedger'
+            type: array
+      summary: List swaps requested by partner
+      tags:
+      - swaps
+  /v1/swap/{id}:
+    get:
+      description: Get details for a specific swap
+      parameters:
+      - description: Swap ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SwapLedger'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get swap transaction details
+      tags:
+      - swaps
+  /v1/swap/claims:
+    get:
+      description: Partner B pulls all PENDING swaps to be claimed
+      parameters:
+      - description: Source Partner ID
+        in: query
+        name: source_partner_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwapLedger'
+            type: array
+      summary: Claim PENDING swaps
+      tags:
+      - swaps
+  /v1/swap/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Partner B confirms a swap (settlement)
+      parameters:
+      - description: Swap confirmation
+        in: body
+        name: confirm
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConfirmSwapRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Confirm a swap
+      tags:
+      - swaps
+  /v1/swap/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Partner A pushes a point deduction request
+      parameters:
+      - description: Swap request
+        in: body
+        name: deposit
+        required: true
+        schema:
+          $ref: '#/definitions/models.SwapRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deposit (initiate a point swap)
+      tags:
+      - swaps
+  /v1/swaps:
+    get:
+      description: List swap records filtered by custom criteria
+      parameters:
+      - description: Status (PENDING, COMPLETED, etc.)
+        in: query
+        name: status
+        type: string
+      - description: Source Partner ID
+        in: query
+        name: source_partner_id
+        type: string
+      - description: Target Partner ID
+        in: query
+        name: target_partner_id
+        type: string
+      - description: From date (YYYY-MM-DD)
+        in: query
+        name: from
+        type: string
+      - description: To date (YYYY-MM-DD)
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwapLedger'
+            type: array
+      summary: List swap records with custom filters
+      tags:
+      - swaps
+swagger: "2.0"

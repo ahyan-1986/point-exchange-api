@@ -1,0 +1,745 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/v1/admin/ledger": {
+            "get": {
+                "description": "Admin: Query swap ledger with filters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Query swap ledger",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/health": {
+            "get": {
+                "description": "Returns service health status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners": {
+            "get": {
+                "description": "Get a list of all partners (admin only)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "partners"
+                ],
+                "summary": "List all partners",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Partner"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Register a new partner (admin only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "partners"
+                ],
+                "summary": "Register a new partner",
+                "parameters": [
+                    {
+                        "description": "Partner info",
+                        "name": "partner",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.RegisterPartnerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Partner"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners/{id}": {
+            "get": {
+                "description": "Get details for a specific partner",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "partners"
+                ],
+                "summary": "Get partner details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Partner"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners/{id}/activate": {
+            "patch": {
+                "description": "Set a partner's active status (admin only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "partners"
+                ],
+                "summary": "Activate or deactivate a partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Active status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ActivatePartnerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Partner"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners/{id}/rates": {
+            "get": {
+                "description": "Get all point rates for a partner",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rates"
+                ],
+                "summary": "List all rates for a partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Rate"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add or update a point rate for a partner (admin only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rates"
+                ],
+                "summary": "Add or update a partner's point rate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rate info",
+                        "name": "rate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddOrUpdateRateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners/{id}/swaps/received": {
+            "get": {
+                "description": "List all swaps where this partner is the target (received swaps)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "List swaps received by partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwapLedger"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/partners/{id}/swaps/requested": {
+            "get": {
+                "description": "List all swaps where this partner is the source (requested swaps)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "List swaps requested by partner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Partner ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwapLedger"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swap/claims": {
+            "get": {
+                "description": "Partner B pulls all PENDING swaps to be claimed",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "Claim PENDING swaps",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Source Partner ID",
+                        "name": "source_partner_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwapLedger"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swap/confirm": {
+            "post": {
+                "description": "Partner B confirms a swap (settlement)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "Confirm a swap",
+                "parameters": [
+                    {
+                        "description": "Swap confirmation",
+                        "name": "confirm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ConfirmSwapRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swap/deposit": {
+            "post": {
+                "description": "Partner A pushes a point deduction request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "Deposit (initiate a point swap)",
+                "parameters": [
+                    {
+                        "description": "Swap request",
+                        "name": "deposit",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SwapRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swap/{id}": {
+            "get": {
+                "description": "Get details for a specific swap",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "Get swap transaction details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Swap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SwapLedger"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/swaps": {
+            "get": {
+                "description": "List swap records filtered by custom criteria",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "swaps"
+                ],
+                "summary": "List swap records with custom filters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Status (PENDING, COMPLETED, etc.)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source Partner ID",
+                        "name": "source_partner_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Target Partner ID",
+                        "name": "target_partner_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "To date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwapLedger"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "internal_handlers.RegisterPartnerRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "api_key": {
+                    "type": "string"
+                },
+                "api_secret": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ActivatePartnerRequest": {
+            "type": "object",
+            "properties": {
+                "is_active": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.AddOrUpdateRateRequest": {
+            "type": "object",
+            "properties": {
+                "min_exchange_points": {
+                    "type": "number"
+                },
+                "point_type": {
+                    "type": "string"
+                },
+                "points_per_usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.ConfirmSwapRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Partner": {
+            "type": "object",
+            "properties": {
+                "api_key": {
+                    "type": "string"
+                },
+                "api_secret": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Rate": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "effective_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "min_exchange_points": {
+                    "type": "number"
+                },
+                "partner_id": {
+                    "type": "string"
+                },
+                "point_type": {
+                    "type": "string"
+                },
+                "points_per_usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.SwapLedger": {
+            "type": "object",
+            "properties": {
+                "claimed_at": {
+                    "type": "string"
+                },
+                "commission_usd": {
+                    "type": "number"
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "exchange_rate_at_time": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "source_customer_id": {
+                    "type": "string"
+                },
+                "source_external_ref": {
+                    "type": "string"
+                },
+                "source_partner_id": {
+                    "type": "string"
+                },
+                "source_points": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "target_customer_id": {
+                    "type": "string"
+                },
+                "target_partner_id": {
+                    "type": "string"
+                },
+                "target_points": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "usd_value": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.SwapRequest": {
+            "type": "object",
+            "required": [
+                "source_customer_id",
+                "source_external_id",
+                "source_partner_id",
+                "source_points",
+                "target_customer_id",
+                "target_partner_id"
+            ],
+            "properties": {
+                "source_customer_id": {
+                    "type": "string"
+                },
+                "source_external_id": {
+                    "type": "string"
+                },
+                "source_partner_id": {
+                    "type": "string"
+                },
+                "source_points": {
+                    "type": "number"
+                },
+                "target_customer_id": {
+                    "type": "string"
+                },
+                "target_partner_id": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
