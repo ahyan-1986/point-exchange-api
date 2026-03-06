@@ -32,11 +32,3 @@ jobs:
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
 
-      - name: Make image public
-        run: |
-          gh api -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            /user/packages/container/point-exchange-api/visibility \
-            -f visibility=public
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
