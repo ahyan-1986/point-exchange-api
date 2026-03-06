@@ -47,32 +47,37 @@ func (r *swapRepo) CreateSwap(ctx context.Context, swap *models.SwapLedger) (str
 	return id, nil
 }
 
-func (r *swapRepo) ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedger, error) {
-	query := `SELECT id, source_partner_id, source_external_ref, source_customer_id, source_points, usd_value, exchange_rate_at_time, commission_usd, target_partner_id, target_customer_id, target_points, status, created_at, updated_at, claimed_at, completed_at FROM swap_ledger WHERE 1=1`
+func (r *swapRepo) ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedgerWithPartnerNames, error) {
+	query := `SELECT s.id, s.source_partner_id, s.source_external_ref, s.source_customer_id, s.source_points, s.usd_value, s.exchange_rate_at_time, s.commission_usd, s.target_partner_id, s.target_customer_id, s.target_points, s.status, s.created_at, s.updated_at, s.claimed_at, s.completed_at,
+		sp.name as source_partner_name, tp.name as target_partner_name
+		FROM swap_ledger s
+		LEFT JOIN partners sp ON s.source_partner_id = sp.id
+		LEFT JOIN partners tp ON s.target_partner_id = tp.id
+		WHERE 1=1`
 	args := []interface{}{}
 	idx := 1
 	if status != "" {
-		query += ` AND status = $` + strconv.Itoa(idx)
+		query += ` AND s.status = $` + strconv.Itoa(idx)
 		args = append(args, status)
 		idx++
 	}
 	if sourcePartnerID != "" {
-		query += ` AND source_partner_id = $` + strconv.Itoa(idx)
+		query += ` AND s.source_partner_id = $` + strconv.Itoa(idx)
 		args = append(args, sourcePartnerID)
 		idx++
 	}
 	if targetPartnerID != "" {
-		query += ` AND target_partner_id = $` + strconv.Itoa(idx)
+		query += ` AND s.target_partner_id = $` + strconv.Itoa(idx)
 		args = append(args, targetPartnerID)
 		idx++
 	}
 	if from != "" {
-		query += ` AND created_at >= $` + strconv.Itoa(idx)
+		query += ` AND s.created_at >= $` + strconv.Itoa(idx)
 		args = append(args, from)
 		idx++
 	}
 	if to != "" {
-		query += ` AND created_at <= $` + strconv.Itoa(idx)
+		query += ` AND s.created_at <= $` + strconv.Itoa(idx)
 		args = append(args, to)
 		idx++
 	}
@@ -81,24 +86,24 @@ func (r *swapRepo) ListSwapsWithFilter(ctx context.Context, status, sourcePartne
 		return nil, err
 	}
 	defer rows.Close()
-	var swaps []*models.SwapLedger
+	var swaps []*models.SwapLedgerWithPartnerNames
 	for rows.Next() {
-		swap := &models.SwapLedger{}
+		swap := &models.SwapLedgerWithPartnerNames{}
 		var exchangeRate, commission sql.NullFloat64
 		var claimedAt, completedAt sql.NullTime
-		err := rows.Scan(&swap.ID, &swap.SourcePartnerID, &swap.SourceExternalRef, &swap.SourceCustomerID, &swap.SourcePoints, &swap.USDValue, &exchangeRate, &commission, &swap.TargetPartnerID, &swap.TargetCustomerID, &swap.TargetPoints, &swap.Status, &swap.CreatedAt, &swap.UpdatedAt, &claimedAt, &completedAt)
+		err := rows.Scan(&swap.ID, &swap.SourcePartnerID, &swap.SourceExternalRef, &swap.SourceCustomerID, &swap.SourcePoints, &swap.USDValue, &exchangeRate, &commission, &swap.TargetPartnerID, &swap.TargetCustomerID, &swap.TargetPoints, &swap.Status, &swap.CreatedAt, &swap.UpdatedAt, &claimedAt, &completedAt, &swap.SourcePartnerName, &swap.TargetPartnerName)
 		if err != nil {
 			return nil, err
 		}
 		if exchangeRate.Valid {
-			swap.ExchangeRateAtTime = &exchangeRate.Float64
+			swap.ExchangeRateAtTime = exchangeRate.Float64
 		} else {
-			swap.ExchangeRateAtTime = nil
+			swap.ExchangeRateAtTime = 0
 		}
 		if commission.Valid {
-			swap.CommissionUSD = &commission.Float64
+			swap.CommissionUSD = commission.Float64
 		} else {
-			swap.CommissionUSD = nil
+			swap.CommissionUSD = 0
 		}
 		if claimedAt.Valid {
 			t := claimedAt.Time

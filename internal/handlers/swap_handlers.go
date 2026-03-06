@@ -17,7 +17,7 @@ type SwapServiceInterface interface {
 	ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
 	ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
 	ConfirmSwap(ctx context.Context, id string) error
-	ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedger, error)
+	ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedgerWithPartnerNames, error)
 }
 
 // SwapService is injected at startup
