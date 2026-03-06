@@ -7,15 +7,7 @@ import (
 	"strconv"
 )
 
-type SwapRepository interface {
-	CreateSwap(ctx context.Context, swap *models.SwapLedger) (string, error)
-	GetSwapByID(ctx context.Context, id string) (*models.SwapLedger, error)
-	GetPendingSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
-	ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
-	ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
-	ConfirmSwap(ctx context.Context, id string) error
-	ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedger, error)
-}
+// (removed stray method declarations)
 
 type swapRepo struct {
 	db *sql.DB
@@ -96,14 +88,14 @@ func (r *swapRepo) ListSwapsWithFilter(ctx context.Context, status, sourcePartne
 			return nil, err
 		}
 		if exchangeRate.Valid {
-			swap.ExchangeRateAtTime = exchangeRate.Float64
+			swap.ExchangeRateAtTime = &exchangeRate.Float64
 		} else {
-			swap.ExchangeRateAtTime = 0
+			swap.ExchangeRateAtTime = nil
 		}
 		if commission.Valid {
-			swap.CommissionUSD = commission.Float64
+			swap.CommissionUSD = &commission.Float64
 		} else {
-			swap.CommissionUSD = 0
+			swap.CommissionUSD = nil
 		}
 		if claimedAt.Valid {
 			t := claimedAt.Time
@@ -269,6 +261,16 @@ func (r *swapRepo) ListSwapsByTargetPartnerID(ctx context.Context, partnerID str
 		swaps = append(swaps, swap)
 	}
 	return swaps, nil
+}
+
+type SwapRepository interface {
+	CreateSwap(ctx context.Context, swap *models.SwapLedger) (string, error)
+	GetSwapByID(ctx context.Context, id string) (*models.SwapLedger, error)
+	GetPendingSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
+	ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
+	ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
+	ConfirmSwap(ctx context.Context, id string) error
+	ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedgerWithPartnerNames, error)
 }
 
 func NewSwapRepository(db *sql.DB) SwapRepository {

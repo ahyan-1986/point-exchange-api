@@ -20,7 +20,7 @@ func (s *SwapService) ListSwapsByTargetPartnerID(ctx context.Context, partnerID 
 	return s.Repo.ListSwapsByTargetPartnerID(ctx, partnerID)
 }
 
-func (s *SwapService) ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedger, error) {
+func (s *SwapService) ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedgerWithPartnerNames, error) {
 	return s.Repo.ListSwapsWithFilter(ctx, status, sourcePartnerID, targetPartnerID, from, to)
 }
 

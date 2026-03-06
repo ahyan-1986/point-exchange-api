@@ -30,6 +30,16 @@ type SwapLedger struct {
 	CompletedAt        *time.Time `json:"completed_at"`
 }
 
+// SwapLedgerWithPartnerNames is used for API responses with partner names
+// It embeds SwapLedger and adds source/target partner names for display
+// This is not stored in the DB, only for API output
+//
+type SwapLedgerWithPartnerNames struct {
+	SwapLedger
+	SourcePartnerName string `json:"source_partner_name"`
+	TargetPartnerName string `json:"target_partner_name"`
+}
+
 type ConfirmSwapRequest struct {
 	ID string `json:"id"`
 }

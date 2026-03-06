@@ -1,12 +1,13 @@
+package models
+
+import "time"
+
 // SwapLedgerWithPartnerNames is used for API responses with partner names
 type SwapLedgerWithPartnerNames struct {
 	SwapLedger
 	SourcePartnerName string `json:"source_partner_name"`
 	TargetPartnerName string `json:"target_partner_name"`
 }
-package models
-
-import "time"
 
 // SwapRequest 定义 A 方发过来的 JSON 格式
 type SwapRequest struct {
