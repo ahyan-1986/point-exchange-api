@@ -14,6 +14,7 @@ import (
 // @Param        id path string true "Partner ID"
 // @Success      200 {array} models.SwapLedger
 // @Router       /v1/partners/{id}/swaps/requested [get]
+// @Success      200 {array} models.SwapLedgerWithPartnerNames
 func ListSwapsRequested(c *gin.Context) {
 	partnerID := c.Param("id")
 	swaps, err := SwapService.ListSwapsBySourcePartnerID(c.Request.Context(), partnerID)
@@ -32,6 +33,7 @@ func ListSwapsRequested(c *gin.Context) {
 // @Param        id path string true "Partner ID"
 // @Success      200 {array} models.SwapLedger
 // @Router       /v1/partners/{id}/swaps/received [get]
+// @Success      200 {array} models.SwapLedgerWithPartnerNames
 func ListSwapsReceived(c *gin.Context) {
 	partnerID := c.Param("id")
 	swaps, err := SwapService.ListSwapsByTargetPartnerID(c.Request.Context(), partnerID)

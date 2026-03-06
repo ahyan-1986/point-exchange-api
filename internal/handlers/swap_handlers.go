@@ -14,8 +14,8 @@ type SwapServiceInterface interface {
 	CreateSwap(ctx context.Context, req *models.SwapRequest) (string, error)
 	GetSwap(ctx context.Context, id string) (*models.SwapLedger, error)
 	ClaimSwaps(ctx context.Context, sourcePartnerID string) ([]*models.SwapLedger, error)
-	ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
-	ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error)
+	ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedgerWithPartnerNames, error)
+	ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedgerWithPartnerNames, error)
 	ConfirmSwap(ctx context.Context, id string) error
 	ListSwapsWithFilter(ctx context.Context, status, sourcePartnerID, targetPartnerID, from, to string) ([]*models.SwapLedgerWithPartnerNames, error)
 }

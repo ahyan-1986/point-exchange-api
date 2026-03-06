@@ -12,11 +12,11 @@ type SwapService struct {
 	PartnerRepo db.PartnerRepository
 }
 
-func (s *SwapService) ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error) {
+func (s *SwapService) ListSwapsBySourcePartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedgerWithPartnerNames, error) {
 	return s.Repo.ListSwapsBySourcePartnerID(ctx, partnerID)
 }
 
-func (s *SwapService) ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedger, error) {
+func (s *SwapService) ListSwapsByTargetPartnerID(ctx context.Context, partnerID string) ([]*models.SwapLedgerWithPartnerNames, error) {
 	return s.Repo.ListSwapsByTargetPartnerID(ctx, partnerID)
 }
 
