@@ -13,6 +13,7 @@ import (
 	swapHandlers "point-exchange-api/internal/handlers"
 	"point-exchange-api/internal/services"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	_ "github.com/lib/pq"
@@ -38,6 +39,8 @@ func main() {
 	adminHandlers.AdminService = adminService
 
 	r := gin.Default()
+	// Enable CORS for all origins (demo)
+	r.Use(cors.Default())
 
 	// --- Dependency Injection ---
 	swapRepo := dbpkg.NewSwapRepository(db)
